@@ -1,13 +1,72 @@
-import React from "react";
+import React, { useState } from "react";
+import { Button, FormGroup, FormControl, FormLabel} from "react-bootstrap";
+import "../Login.css";
+import axios from 'axios';
+import {Redirect} from 'react-router-dom';
+import {useAuth} from '../context/auth';
 
-const Login = () => {
-  // make a post request to retrieve a token from the api
-  // when you have handled the token, navigate to the BubblePage route
+function Login() {
+  const [isLoggedIn, setLoggedIn] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [username, setusername] = useState("");
+  const [password, setPassword] = useState("");
+  const { setAuthTokens } = useAuth();
+  
+
+  function postLogin() {
+    let loginURL = 'http://localhost:5000/api/login';
+    axios.post(loginURL, {
+      username,
+      password
+    }).then(result => {
+      if (result.status === 200) {
+        setAuthTokens(result.data);
+        setLoggedIn(true);
+      } else {
+        setIsError(true);
+      }
+    }).catch(e => {
+      setIsError(true);
+    });
+  }
+
+  if (isLoggedIn) {
+    return <Redirect to="/bubbles" />;
+  }
+
+  function handleSubmit(e){
+    e.preventDefault();
+  };
+
+
+
   return (
-    <>
-      <h1>Welcome to the Bubble App!</h1>
-      <p>Build a login page here</p>
-    </>
+    
+    <div className="Login">
+      <form onSubmit={handleSubmit}>
+        <FormGroup controlId="username" bsSize="large">
+          <FormLabel>username</FormLabel>
+          <FormControl
+            autoFocus
+            type="username"
+            value={username}
+            onChange={e => setusername(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup controlId="password" bsSize="large">
+          <FormLabel>Password</FormLabel>
+          <FormControl
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            type="password"
+          />
+        </FormGroup>
+        <Button block bsSize="large" onClick={postLogin}>
+          Login
+        </Button>
+        { isError &&<p>Come on, man. You forgot your login details? Again</p> }
+      </form>
+    </div>
   );
 };
 
