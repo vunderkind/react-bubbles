@@ -1,70 +1,43 @@
 import React, { useState } from "react";
-import { Button, FormGroup, FormControl, FormLabel} from "react-bootstrap";
 import "../Login.css";
-import axios from 'axios';
-import {Redirect} from 'react-router-dom';
-import {useAuth} from '../context/auth';
+// import {Redirect} from 'react-router-dom';
+import Logo from "../logo.png";
+import {axioswithAuth} from './axioswithAuth';
 
-function Login() {
-  const [isLoggedIn, setLoggedIn] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [username, setusername] = useState("");
-  const [password, setPassword] = useState("");
-  const { setAuthTokens } = useAuth();
+function Login(props) {
+  const [login, setLogin] = useState({username: "", password: ""});
+  const isLoggedIn = true;
+
+  // function postLogin() {
+  // }
   
 
-  function postLogin() {
-    let loginURL = 'http://localhost:5000/api/login';
-    axios.post(loginURL, {
-      username,
-      password
-    }).then(result => {
-      if (result.status === 200) {
-        setAuthTokens(result.data);
-        setLoggedIn(true);
-      } else {
-        setIsError(true);
-      }
-    }).catch(e => {
-      setIsError(true);
-    });
-  }
-
-  if (isLoggedIn) {
-    return <Redirect to="/bubbles" />;
-  }
+  // if (isLoggedIn) {
+  //   return <Redirect to="/bubbles" />;
+  // }
 
   function handleSubmit(e){
-    e.preventDefault();
+      e.preventDefault();
+      axioswithAuth()
+      .post('/login', login)
+      .then(res=>
+        localStorage.setItem('token', res.data.payload))
+        props.history.push('/bubbles')
   };
 
+  console.log(login);
 
+  const handleUsername= (e) => setLogin({...login, username: e.target.value,});
+  const handlePass= (e) => setLogin({...login, password: e.target.value,})
 
   return (
     
     <div className="Login">
+    <img src={Logo} className="Logo" alt="logo"/>
       <form onSubmit={handleSubmit}>
-        <FormGroup controlId="username" bsSize="large">
-          <FormLabel>username</FormLabel>
-          <FormControl
-            autoFocus
-            type="username"
-            value={username}
-            onChange={e => setusername(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup controlId="password" bsSize="large">
-          <FormLabel>Password</FormLabel>
-          <FormControl
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            type="password"
-          />
-        </FormGroup>
-        <Button block bsSize="large" onClick={postLogin}>
-          Login
-        </Button>
-        { isError &&<p>Come on, man. You forgot your login details? Again</p> }
+        <input type = "text" placeholder="username" onChange={handleUsername}/>
+        <input type = "password" placeholder="password" onChange={handlePass}/>
+        <button>Log in</button>
       </form>
     </div>
   );

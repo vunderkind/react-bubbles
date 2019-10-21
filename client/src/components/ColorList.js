@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, } from "react";
 import {axioswithAuth} from './axioswithAuth';
 
 const initialColor = {
@@ -45,8 +45,9 @@ const ColorList = ({ colors, updateColors }) => {
   const deleteColor = color => {
     axioswithAuth()
     .delete(`http://localhost:5000/api/colors/${color.id}`)
-    .then(res => console.log(res))
-    .catch(err => console.log(err))
+    .then(() =>
+    updateColors([...colors])
+    )
   };
 
   return (
@@ -54,11 +55,11 @@ const ColorList = ({ colors, updateColors }) => {
       <p>colors</p>
       <ul>
         {colors.map(color => (
-          <li key={color.color} onClick={() => editColor(color)}>
-            <span>
-              <span className="delete" onClick={() => deleteColor(color)}>
-                DELETE!
-              </span>{" "}
+          <li>
+          <button className="delete" onClick={() => deleteColor(color)}>
+                x
+              </button>{" "}
+            <span key={color.color} onClick={() => editColor(color)}>
               {color.color}
             </span>
             <div
