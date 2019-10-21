@@ -43,11 +43,29 @@ const ColorList = ({ colors, updateColors }) => {
 
 
   const deleteColor = color => {
-    axioswithAuth()
-    .delete(`http://localhost:5000/api/colors/${color.id}`)
-    .then(() =>
-    updateColors([...colors])
-    )
+    // make a delete request to delete this color
+       const id =color.id
+    console.log('ID',id)
+    const filtered = colors.filter(e => 
+       e.id !== id )
+         
+     
+  //  updateColors(filtered)
+ 
+
+     axioswithAuth()
+    .delete(`http://localhost:5000/api/colors/${id}`,color)
+    .then(res => {
+      console.log("DELETE THIS=>",res.data )
+      console.log(id)
+      console.log("REZ-DELETE",res)
+      console.log("COLORS",colors)
+      console.log("COLOR",color)
+      //  setColorToEdit(color)
+        console.log("FILTERED", filtered)
+       updateColors(filtered)    
+    })
+    .catch(err => console.log(err));
   };
 
   return (
