@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, } from "react";
+import {axioswithAuth} from './axioswithAuth';
 
 const initialColor = {
   color: "",
@@ -21,10 +21,51 @@ const ColorList = ({ colors, updateColors }) => {
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
+
+    let activeColor = colors.filter(color => color.id === colorToEdit.id)
+
+    axioswithAuth()
+      .put(`http://localhost:5000/api/colors/${activeColor[0].id}`, colorToEdit)
+      .then(res => {
+
+        console.log(res)
+
+        colors = colors.filter(color => color.id !== res.data.id)
+        updateColors([...colors, res.data])
+
+
+        setEditing(false)
+      })
+      .catch(err => console.log(err))
+    //console.log(colorList)
+
   };
+
 
   const deleteColor = color => {
     // make a delete request to delete this color
+       const id =color.id
+    console.log('ID',id)
+    const filtered = colors.filter(e => 
+       e.id !== id )
+         
+     
+  //  updateColors(filtered)
+ 
+
+     axioswithAuth()
+    .delete(`http://localhost:5000/api/colors/${id}`,color)
+    .then(res => {
+      console.log("DELETE THIS=>",res.data )
+      console.log(id)
+      console.log("REZ-DELETE",res)
+      console.log("COLORS",colors)
+      console.log("COLOR",color)
+      //  setColorToEdit(color)
+        console.log("FILTERED", filtered)
+       updateColors(filtered)    
+    })
+    .catch(err => console.log(err));
   };
 
   return (
@@ -32,11 +73,11 @@ const ColorList = ({ colors, updateColors }) => {
       <p>colors</p>
       <ul>
         {colors.map(color => (
-          <li key={color.color} onClick={() => editColor(color)}>
-            <span>
-              <span className="delete" onClick={() => deleteColor(color)}>
+          <li>
+          <button className="delete" onClick={() => deleteColor(color)}>
                 x
-              </span>{" "}
+              </button>{" "}
+            <span key={color.color} onClick={() => editColor(color)}>
               {color.color}
             </span>
             <div

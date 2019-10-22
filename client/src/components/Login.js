@@ -1,13 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
+import "../Login.css";
+// import {Redirect} from 'react-router-dom';
+import Logo from "../logo.png";
+import {axioswithAuth} from './axioswithAuth';
 
-const Login = () => {
-  // make a post request to retrieve a token from the api
-  // when you have handled the token, navigate to the BubblePage route
+function Login(props) {
+  const [login, setLogin] = useState({username: "", password: ""});
+  const isLoggedIn = true;
+
+  // function postLogin() {
+  // }
+  
+
+  // if (isLoggedIn) {
+  //   return <Redirect to="/bubbles" />;
+  // }
+
+  function handleSubmit(e){
+      e.preventDefault();
+      axioswithAuth()
+      .post('/login', login)
+      .then(res=>
+        localStorage.setItem('token', res.data.payload))
+        props.history.push('/bubbles')
+  };
+
+  console.log(login);
+
+  const handleUsername= (e) => setLogin({...login, username: e.target.value,});
+  const handlePass= (e) => setLogin({...login, password: e.target.value,})
+
   return (
-    <>
-      <h1>Welcome to the Bubble App!</h1>
-      <p>Build a login page here</p>
-    </>
+    
+    <div className="Login">
+    <img src={Logo} className="Logo" alt="logo"/>
+      <form onSubmit={handleSubmit}>
+        <input type = "text" placeholder="username" onChange={handleUsername}/>
+        <input type = "password" placeholder="password" onChange={handlePass}/>
+        <button>Log in</button>
+      </form>
+    </div>
   );
 };
 
